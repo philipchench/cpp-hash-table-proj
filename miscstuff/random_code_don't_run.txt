@@ -1,0 +1,67 @@
+static std::vector<int> vec {1, 2, 3};
+
+class Test
+{
+private:
+    std::vector<int> v;
+
+public:
+    // Default constructor
+    Test(int x = 0) 
+    {
+        v.push_back(x);
+    }
+    // Copy constructor
+    Test(const Test& test) :
+        v(test.v)
+    {
+        std::cout << "Copy constructor called\n"; // just to prove it works
+    }
+
+    void push_back(int x) {
+        v.push_back(x);
+    }
+
+    void print() {
+        for (int i : v) {
+            std::cout << i << "\n";
+        }
+    }
+
+    friend std::ostream& operator<<(std::ostream& out, const Test& f1);
+};
+
+std::ostream& operator<<(std::ostream& out, const Test& f1)
+{
+    out << "length of v is: " << f1.v.size();
+}
+
+/*
+This only works because std vector handles copying properly
+Must do deep copy work if you have weird stuff like pointer fields.
+*/
+void copy_test_1() {
+    Test six = Test(6);
+    Test sixc = six;
+    six.push_back(7);
+    std::cout << sixc << "\n";
+    sixc.print(); // prints [6]
+    six.print(); // prints [6, 7]
+}
+
+void print_info() {
+    std::cout << __cplusplus << " c++ version, on windows WSL2\n";
+    std::cout << "Hello World\n";
+    f(9, 10);
+}
+
+void stuff_about_getline() {
+    std::cout << "Pick 1 or 2: ";
+    int choice{};
+    std::cin >> choice;
+    std::cout << "Enter your full name: ";
+    std::string name{};
+    std::getline(std::cin >> std::ws, name);
+    std::cout << "Choice is: " << choice << "\nYour name is " << name << ", hiiii\n";
+    
+}
