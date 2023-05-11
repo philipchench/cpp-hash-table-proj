@@ -51,13 +51,13 @@ class HashTable
         {
             int idx = hash_func(key);
             auto& bucket = buckets[idx];
-
+            
             // if item is in the bucket, then we erase it
-            for (auto& item : bucket)
+            for (auto it{ bucket.begin() }; it != bucket.end(); it++)
             {
-                if (item.first == key)
+                if (it->first == key)
                 {
-                    bucket.erase(item);
+                    bucket.erase(it);
                     std::cout << "Successfully erased key.\n";
                     return;
                 }
@@ -82,8 +82,8 @@ class HashTable
                 }
             }
             // for now return null
-            std::cout << "get key failed: returned NULL.\n";
-            return NULL;
+            std::cout << "get key failed: returned empty object.\n";
+            return null_object_;
         }
 
         // custom stdout
@@ -106,7 +106,8 @@ class HashTable
     private:
         // buckets to hash items to, each bucket is a std::list of pairs
         std::vector<std::list<std::pair<K, V>>> buckets;
-
+        // for return null object
+        static V null_object_;
         // hash function using std::hash and then mod by buckets size
         int hash_func(K& key)
         {
