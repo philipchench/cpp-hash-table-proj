@@ -111,6 +111,7 @@ class HashTable
         // hash function using std::hash and then mod by buckets size
         int hash_func(K& key)
         {
+            // std::cout << std::to_string(std::hash<K>()(key)) + "\n";
             return std::hash<K>()(key) % buckets.size();
         }
 
