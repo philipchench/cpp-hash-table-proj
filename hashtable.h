@@ -19,7 +19,7 @@ class HashTable
 
     public:
         // constructor that takes input the size of buckets vector
-        HashTable(int size=10)
+        HashTable(int size=10, float max_load_factor=1.0) : count{0}, max_load_factor{max_load_factor}
         {
             buckets.resize(size);
         }
@@ -28,17 +28,23 @@ class HashTable
         ~HashTable() {}
 
         // insert key value pair into the hash table
-        void insert(K& key, V& value)
+        void insert(const K& key, V value)
         {
-            int idx = hash_func(key);
+            float loadfac = float(count) / buckets.size();
+            if (loadfac > max_load_factor)
+            {
+                std::cout << "resizing at count: " << count << "\n";
+                resize();
+            }
+            int idx = hash_func(key, buckets.size());
             auto& bucket = buckets[idx];
-
+            count++;
             // if item is in the bucket, then we update the value
             for (auto& item : bucket)
             {
                 if (item.first == key)
                 {
-                    item.second = value;
+                    item.second = std::move(value);
                     return;
                 }
             }
@@ -49,9 +55,9 @@ class HashTable
         // remove key from hash table if found
         void remove(K& key)
         {
-            int idx = hash_func(key);
+            int idx = hash_func(key, buckets.size());
             auto& bucket = buckets[idx];
-            
+            count--;
             // if item is in the bucket, then we erase it
             for (auto it{ bucket.begin() }; it != bucket.end(); it++)
             {
@@ -67,9 +73,9 @@ class HashTable
         }
 
         // return value corresponding to key if found
-        V& get(K& key)
+        V& get(const K& key)
         {
-            int idx = hash_func(key);
+            int idx = hash_func(key, buckets.size());
             auto& bucket = buckets[idx];
 
             // if item is in the bucket, then we erase it
@@ -83,7 +89,8 @@ class HashTable
             }
             // for now return null
             std::cout << "get key failed: returned empty object.\n";
-            return null_object_;
+            bucket.push_back(std::make_pair(key, V()));
+            return bucket.back().second;
         }
 
         // custom stdout
@@ -104,15 +111,34 @@ class HashTable
         }
 
     private:
+        int count;
+        float max_load_factor;
         // buckets to hash items to, each bucket is a std::list of pairs
         std::vector<std::list<std::pair<K, V>>> buckets;
-        // for return null object
-        static V null_object_;
         // hash function using std::hash and then mod by buckets size
-        int hash_func(K& key)
+        int hash_func(const K& key, int numbuckets)
         {
             // std::cout << std::to_string(std::hash<K>()(key)) + "\n";
-            return std::hash<K>()(key) % buckets.size();
+            return std::hash<K>()(key) % numbuckets;
+        }
+
+        void resize()
+        {
+            auto oldsize = buckets.size();
+            auto newsize = oldsize * 2;
+            std::vector<std::list<std::pair<K, V>>> newbuckets(newsize);
+            for (auto& bucket : buckets)
+            {
+                for (auto it{ bucket.begin() }; it != bucket.end();)
+                {
+                    auto iter_copy = it;
+                    it++;
+                    int idx = hash_func(iter_copy->first, newsize);
+                    auto& newbucket = newbuckets[idx];
+                    newbucket.splice(newbucket.end(), bucket, iter_copy);
+                }
+            }
+            buckets = newbuckets;
         }
 
 };

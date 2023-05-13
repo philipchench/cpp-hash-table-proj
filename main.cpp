@@ -34,14 +34,14 @@ class Test
 
 };
 
-template <>
-int HashTable<std::string, int>::null_object_ = 0;
-template <>
-int HashTable<int, int>::null_object_ = 0;
-template <>
-double HashTable<double, double>::null_object_ = 0;
-template <>
-double HashTable<int, double>::null_object_ = 0;
+// template <>
+// int HashTable<std::string, int>::null_object_ = 0;
+// template <>
+// int HashTable<int, int>::null_object_ = 0;
+// template <>
+// double HashTable<double, double>::null_object_ = 0;
+// template <>
+// double HashTable<int, double>::null_object_ = 0;
 
 
 /*
@@ -195,7 +195,7 @@ void testclass()
 
 int main(int argc, char const *argv[])
 {
-    testclass();
+    string_test();
     return 0;
 }
 
